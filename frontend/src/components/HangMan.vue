@@ -12,9 +12,9 @@
       <div class="input_menu">
         <div class="card input_letter_container">
           <input class="input_letter" maxlength="1" v-model="input" onkeydown="return /[a-z]/i.test(event.key)">
-          <div class="button">ENTER</div>
+          <div :class="input? 'button':'disabled button'" @click="sendLetter">Enter letter</div>
         </div>
-        <div class="button">RESET</div>
+        <div class="button" @click="reset">RESET</div>
       </div>
     </div>
   </div>
@@ -22,6 +22,7 @@
 
 <script>
 import DrawGallows from "@/components/DrawGallows";
+import axios from "axios";
 
 export default {
   name: "HangMan",
@@ -30,9 +31,28 @@ export default {
     return {
       input: null,
       state: 0,
-      letters: ["a", "b", "", "d"]
+
+      letters: []
     }
   },
+  methods: {
+    reset() {
+      axios.post('/reset').then(() => this.clearAll()).catch(error => console.log(error))
+
+    },
+    sendLetter() {
+      axios.post('/push_letter', this.input).then(resp => this.fetchData(resp)).catch(error => console.log(error))
+    },
+    fetchData(resp) {
+      this.letters = resp.letters
+    },
+    clearAll() {
+      this.input = null
+      this.state = 0
+
+      this.letters = []
+    }
+  }
 }
 </script>
 
@@ -55,36 +75,6 @@ export default {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-}
-
-.card {
-  padding: 10px;
-  margin: 8px;
-
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.button {
-  height: fit-content;
-
-  margin: 5px;
-  padding: 2px 10px;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  background-color: #d5d5d5;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-
-  transition: 0.3s;
-}
-
-.button:hover {
-  background-color: #bdbdbd;
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
 .input_menu {
