@@ -1,7 +1,7 @@
 <template>
   <div class="main_container">
     <div class="draw_container card">
-
+      <DrawGallows :state="state"/>
     </div>
     <div class="menu_container card">
       <div class="card letter_sequence">
@@ -21,11 +21,15 @@
 </template>
 
 <script>
+import DrawGallows from "@/components/DrawGallows";
+
 export default {
   name: "HangMan",
+  components: {DrawGallows},
   data() {
     return {
       input: null,
+      state: 0,
       letters: ["a", "b", "", "d"]
     }
   },
@@ -36,7 +40,7 @@ export default {
 
 .draw_container {
   display: flex;
-  flex-grow: 1;
+  justify-content: center;
 }
 
 .main_container {
