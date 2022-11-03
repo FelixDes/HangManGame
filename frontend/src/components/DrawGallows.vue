@@ -94,8 +94,8 @@ export default {
 <style scoped>
 
 .canvas {
-  width: 1000px;
-  height: 1000px;
+  width: 800px;
+  height: 800px;
   border: 2px solid black;
 }
 

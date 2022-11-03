@@ -1,12 +1,14 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class HangManModel {
-    private final int MAX_STATE = 5;
+    private final int MAX_STATE = 6;
+    private final String DICTIONARY_PATH = "/home/felix/_Programming/Idea_Projects/OOP/HangManGame/src/main/resources/words.txt";
 
     enum WinStatus {
         FAIL,
@@ -18,17 +20,24 @@ public class HangManModel {
     private Character[] currentLetters;
     private int state = 0;
     private WinStatus winFlag = WinStatus.IN_PROCESS;
-
+    private final Random rnd = new Random();
     private final List<Character> alreadyTried = new ArrayList<>();
 
-    public void reset() {
-        word = "abcd";
+    public void reset() throws IOException {
+        word = getRandomWord();
         currentLetters = new Character[word.length()];
         state = 0;
         winFlag = WinStatus.IN_PROCESS;
         alreadyTried.clear();
-//        System.out.println(word);
+
+        System.out.println(word);
     }
+
+    private String getRandomWord() throws IOException {
+        var lines = Files.readAllLines(Paths.get(DICTIONARY_PATH));
+        return lines.get(rnd.nextInt(lines.size()));
+    }
+
 
     public void pushLetter(Character letter) {
         if (word.indexOf(letter) == -1 && !alreadyTried.contains(letter)) {

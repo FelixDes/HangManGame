@@ -17,7 +17,11 @@ public class Hangman extends SimpleHttpServlet {
 
     @Override
     public void init() throws SimpleServletException {
-        m.reset();
+        try {
+            m.reset();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -36,7 +40,6 @@ public class Hangman extends SimpleHttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         m.reset();
-        System.out.println("reset");
         response.setHeader("Access-Control-Allow-Origin", "*");
 
         try (PrintWriter printWriter = response.getWriter()) {
