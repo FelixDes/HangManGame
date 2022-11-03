@@ -1,20 +1,23 @@
 <template>
   <div class="main_container">
     <div class="draw_container card">
-      <DrawGallows :state="state"/>
+      <DrawGallows ref="drawGallows" :state="state"/>
     </div>
     <div class="menu_container card">
-      <div class="card letter_sequence">
-        <div class="letter" v-for="(letter, index) in letters" :key="index">
-          {{ letter }}
+      <div class="letter_container card">
+        <div class="letter_sequence">
+          <span class="letter" v-for="(letter, index) in letters" :key="index">{{ letter }}</span>
+        </div>
+        <div class="already_tried">
+          <span v-for="(letter, index) in alreadyTried" :key="index">{{ letter }}</span>
         </div>
       </div>
       <div class="input_menu">
         <div class="card input_letter_container">
           <input class="input_letter" maxlength="1" v-model="input" onkeydown="return /[a-z]/i.test(event.key)">
-          <div :class="input? 'button':'disabled button'" @click="sendLetter">Enter letter</div>
+          <div :class="input ? 'button' : 'disabled button'" @click="sendLetter"><span>Enter letter</span></div>
         </div>
-        <div class="button" @click="reset">RESET</div>
+        <div class="button" @click="reset"><span>RESET</span></div>
       </div>
     </div>
   </div>
@@ -29,28 +32,29 @@ export default {
   components: {DrawGallows},
   data() {
     return {
+      url: 'http://localhost:8082/Hangman',
       input: null,
-      state: 0,
 
-      letters: []
+      state: 0,
+      letters: [],
+      alreadyTried: [],
     }
+  },
+  mounted() {
+    this.reset()
   },
   methods: {
     reset() {
-      axios.post('/reset').then(() => this.clearAll()).catch(error => console.log(error))
-
+      axios.post(this.url).then(resp => this.fetchData(resp)).catch(error => console.log(error))
+      this.$refs.drawGallows.redraw()
     },
     sendLetter() {
-      axios.post('/push_letter', this.input).then(resp => this.fetchData(resp)).catch(error => console.log(error))
+      axios.get(this.url + '?letter=' + this.input).then(resp => this.fetchData(resp)).catch(error => console.log(error))
     },
     fetchData(resp) {
-      this.letters = resp.letters
-    },
-    clearAll() {
-      this.input = null
-      this.state = 0
-
-      this.letters = []
+      this.letters = resp.data.letters
+      this.state = resp.data.state
+      this.alreadyTried = resp.data.alreadyTried
     }
   }
 }
@@ -61,6 +65,7 @@ export default {
 .draw_container {
   display: flex;
   justify-content: center;
+  flex-grow: 1;
 }
 
 .main_container {
@@ -73,7 +78,6 @@ export default {
 
 .menu_container {
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
 }
 
@@ -87,7 +91,6 @@ export default {
 .input_letter_container {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .input_letter {
@@ -107,6 +110,16 @@ export default {
 
   text-align: center;
   border-bottom: solid gray;
+}
+
+.already_tried {
+  display: flex;
+  flex-direction: row;
+}
+
+.letter_container {
+  display: flex;
+  flex-direction: column;
 }
 
 </style>
