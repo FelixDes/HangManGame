@@ -5,7 +5,7 @@
 <script>
 export default {
   name: "DrawGallows",
-  props: ['state'],
+  props: ['deathState'],
   data() {
     return {
       ctx: null,
@@ -50,8 +50,8 @@ export default {
       this.ctx.stroke()
     },
 
-    drawForState() {
-      let s = this.state
+    drawForDeathState() {
+      let s = this.deathState
 
       this.ctx.beginPath()
 
@@ -84,8 +84,8 @@ export default {
     },
   },
   watch: {
-    state() {
-      this.drawForState()
+    deathState() {
+      this.drawForDeathState()
     }
   }
 }

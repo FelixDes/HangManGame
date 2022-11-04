@@ -2,7 +2,7 @@
   <div>
     <div class="main_container">
       <div class="draw_container card">
-        <DrawGallows ref="drawGallows" :state="state"/>
+        <DrawGallows ref="drawGallows" :deathState="deathState"/>
       </div>
       <div class="menu_container card">
         <div class="letter_container card">
@@ -23,7 +23,7 @@
         </div>
       </div>
     </div>
-    <ScreenSplash class="splash" v-if="winFlag !== 'IN_PROCESS'">
+    <ScreenSplash class="splash" v-if="winFlag === 'WIN' || winFlag === 'FAIL'">
       <template v-if="winFlag === 'WIN'">
         <span>You won!</span>
         <div class="button" @click="reset"><span>Restart?)</span></div>
@@ -46,10 +46,13 @@ export default {
   components: {ScreenSplash, DrawGallows},
   data() {
     return {
-      url: 'http://localhost:8082/Hangman',
+      id: 1,
+
+      urlHangman: 'http://localhost:8082/Hangman',
+      urlId: 'http://localhost:8082/GetId',
       input: null,
 
-      state: 0,
+      deathState: 0,
       letters: [],
       alreadyTried: [],
       winFlag: [],
@@ -58,11 +61,11 @@ export default {
     }
   },
   mounted() {
-    this.reset()
+    this.getId()
   },
   methods: {
     reset() {
-      axios.post(this.url).then(resp => this.fetchData(resp)).catch(error => console.log(error))
+      axios.get(this.urlHangman + "?id=" + this.id + "&reset=true").then(resp => this.fetchData(resp)).catch(error => console.log(error))
       this.$refs.drawGallows.redraw()
       this.splash = false
     },
@@ -70,14 +73,43 @@ export default {
       if (this.winFlag !== 'IN_PROCESS') {
         return
       }
-      axios.get(this.url + '?letter=' + this.input).then(resp => this.fetchData(resp)).catch(error => console.log(error))
+      axios.get(this.urlHangman + "?id=" + this.id + '&letter=' + this.input).then(resp => this.fetchData(resp)).catch(error => console.log(error))
       this.input = null
+    },
+    getId() {
+      let id = this.getCookie('id');
+      // if (!id) {
+        axios.get(this.urlId).then(resp => id = resp).catch(error => console.log(error))
+        this.setCookie('id', id)
+      // }
+      this.id = id
+      this.reset()
     },
     fetchData(resp) {
       this.letters = resp.data.letters
-      this.state = resp.data.state
+      this.deathState = resp.data.deathState
       this.alreadyTried = resp.data.alreadyTried
       this.winFlag = resp.data.winFlag
+    },
+    setCookie(cname, cvalue, exdays) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      let expires = "expires=" + d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    },
+    getCookie(cname) {
+      let name = cname + "=";
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
     }
   }
 }
