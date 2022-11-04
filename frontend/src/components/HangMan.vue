@@ -46,7 +46,7 @@ export default {
   components: {ScreenSplash, DrawGallows},
   data() {
     return {
-      id: 1,
+      id: null,
 
       urlHangman: 'http://localhost:8082/Hangman',
       urlId: 'http://localhost:8082/GetId',
@@ -76,14 +76,15 @@ export default {
       axios.get(this.urlHangman + "?id=" + this.id + '&letter=' + this.input).then(resp => this.fetchData(resp)).catch(error => console.log(error))
       this.input = null
     },
-    getId() {
-      let id = this.getCookie('id');
-      // if (!id) {
-        axios.get(this.urlId).then(resp => id = resp).catch(error => console.log(error))
-        this.setCookie('id', id)
-      // }
-      this.id = id
-      this.reset()
+    async getId() {
+      if (this.id === null) {
+        axios.get(this.urlId).then(resp => {
+          this.id = resp.data
+          this.reset()
+        }).catch(error => console.log(error))
+      } else {
+        this.reset()
+      }
     },
     fetchData(resp) {
       this.letters = resp.data.letters

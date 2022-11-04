@@ -49,13 +49,4 @@ public class HangmanServlet extends SimpleHttpServlet {
             response.sendError(400, "No parameters");
         }
     }
-
-//    @Override
-//    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        response.setHeader("Access-Control-Allow-Origin", "*");
-//
-//        try (PrintWriter printWriter = response.getWriter()) {
-//            printWriter.write(gameState().toString());
-//        }
-//    }
 }
