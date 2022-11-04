@@ -16,6 +16,8 @@ public class DictionaryWordPicker implements WordPicker {
 
     @Override
     public String getWord() {
-        return lines.get(rnd.nextInt(lines.size()));
+        var w = lines.get(rnd.nextInt(lines.size()));
+        System.out.println(w);
+        return w;
     }
 }

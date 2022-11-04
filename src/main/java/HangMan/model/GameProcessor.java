@@ -15,11 +15,13 @@ public class GameProcessor {
 
     public GameInstance createOrResetForId(String id) {
         var word = wordPicker.getWord();
+        var inst = new GameInstance(word);
+        states.put(id, inst);
+
         System.out.println("-");
         states.forEach((key, value) -> System.out.println(key + " | " + value.toJSONObjectString()));
         System.out.println("-");
-        var inst = new GameInstance(word);
-        states.put(id, inst);
+
         return inst;
     }
 

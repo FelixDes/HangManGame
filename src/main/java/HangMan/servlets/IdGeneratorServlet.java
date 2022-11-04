@@ -18,5 +18,6 @@ public class IdGeneratorServlet extends SimpleHttpServlet {
         try (PrintWriter printWriter = response.getWriter()) {
             printWriter.write(UUID.randomUUID().toString());
         }
+
     }
 }
