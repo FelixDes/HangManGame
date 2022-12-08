@@ -2,6 +2,9 @@ package HangMan.servlets;
 
 import HangMan.model.GameInstance;
 import HangMan.model.GameProcessor;
+import org.di.annotations.Component;
+import org.di.annotations.Inject;
+import org.di.annotations.Singleton;
 import servlet.annotations.SimpleWebServlet;
 import servlet.http.HttpServletRequest;
 import servlet.http.HttpServletResponse;
@@ -10,13 +13,12 @@ import servlet.http.SimpleHttpServlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+@Singleton
+@Component
 @SimpleWebServlet(name = "Hangman", value = "/Hangman")
 public class HangmanServlet extends SimpleHttpServlet {
-    GameProcessor gp;
-
-    public HangmanServlet() throws IOException {
-        gp = new GameProcessor();
-    }
+    @Inject
+    private GameProcessor gp;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -1,26 +1,25 @@
 package HangMan.model;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.WeakHashMap;
+import HangMan.db.dao.GameInstanceDAO;
+import org.di.annotations.Component;
+import org.di.annotations.Inject;
+import org.di.annotations.Singleton;
 
+@Singleton
+@Component
 public class GameProcessor {
-    private final String DICTIONARY_PATH = "/home/felix/_Programming/Idea_Projects/OOP/HangManGame/src/main/resources/words.txt";
-    private final Map<String, GameInstance> gameInstances;
-    private final WordPicker wordPicker;
-
-    public GameProcessor() throws IOException {
-        this.gameInstances = new WeakHashMap<>();
-        wordPicker = new DictionaryWordPicker(DICTIONARY_PATH);
-    }
+    @Inject
+    private GameInstanceDAO gameInstanceDAO;
+    @Inject
+    private DictionaryWordPicker wordPicker;
 
     public GameInstance createOrResetForId(String id) {
         var word = wordPicker.getWord();
         var inst = new GameInstance(word);
-        gameInstances.put(id, inst);
+        gameInstanceDAO.update(id, inst);
 
         System.out.println("-");
-        gameInstances.forEach((key, value) -> System.out.println(key + " | " + value.toJSONObjectString()));
+        gameInstanceDAO.getAll().forEach((key, value) -> System.out.println(key + " | " + value.toJSONObjectString()));
         System.out.println("-");
 
         return inst;
@@ -28,15 +27,15 @@ public class GameProcessor {
 
     public GameInstance pushLetterForId(String id, Character letter) {
         GameInstance inst;
-        if (gameInstances.containsKey(id)) {
-            inst = gameInstances.get(id);
+        if (gameInstanceDAO.getAll().containsKey(id)) {
+            inst = gameInstanceDAO.getForId(id);
             inst.pushLetter(letter);
         } else {
             var word = wordPicker.getWord();
             inst = new GameInstance(word);
             inst.pushLetter(letter);
-            gameInstances.put(id, inst);
         }
+        gameInstanceDAO.update(id, inst);
         return inst;
     }
 }

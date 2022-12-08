@@ -9,17 +9,28 @@ import java.util.Objects;
 
 public class GameInstance {
     private final int MAX_DEATH_STATE = 6;
-    public static enum WinStatus {
-        FAIL,
-        WIN,
-        IN_PROCESS
+
+    public enum WinStatus {
+        FAIL (-1),
+        WIN (1),
+        IN_PROCESS (0);
+
+        private final int val;
+
+        private WinStatus(int val) {
+            this.val = val;
+        }
+
+        public int getVal() {
+            return val;
+        }
     }
 
     private String word;
     private Character[] currentLetters;
     private int deathState;
     private WinStatus winFlag;
-    private final List<Character> alreadyTried;
+    private List<Character> alreadyTried;
 
     public GameInstance(String word) {
         this.word = word;
@@ -27,6 +38,18 @@ public class GameInstance {
         winFlag = WinStatus.IN_PROCESS;
         alreadyTried = new ArrayList<>();
         deathState = 0;
+    }
+
+    public GameInstance(String word, Character[] currentLetters, int deathState, int winFlag, List<Character> alreadyTried) {
+        this.word = word;
+        this.currentLetters = currentLetters;
+        this.deathState = deathState;
+        this.alreadyTried = alreadyTried;
+        switch (winFlag) {
+            case 0 -> this.winFlag = WinStatus.IN_PROCESS;
+            case 1 -> this.winFlag = WinStatus.WIN;
+            case -1 -> this.winFlag = WinStatus.FAIL;
+        }
     }
 
     public void pushLetter(Character letter) {
@@ -47,15 +70,27 @@ public class GameInstance {
             winFlag = WinStatus.WIN;
         }
     }
+
     public Character[] getCurrentLetters() {
         return currentLetters;
     }
+
     public WinStatus getWinFlag() {
         return winFlag;
     }
+
     public List<Character> getAlreadyTried() {
         return alreadyTried;
     }
+
+    public String getWord() {
+        return word;
+    }
+
+    public int getDeathState() {
+        return deathState;
+    }
+
     public String toJSONObjectString() {
         JSONObject obj = new JSONObject();
         obj.put("letters", currentLetters);
