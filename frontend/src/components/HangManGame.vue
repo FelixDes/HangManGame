@@ -141,7 +141,7 @@ export default {
 }
 
 .letter_sequence {
-  height: 20px;
+  height: 25px;
   display: flex;
   flex-direction: row;
   justify-content: center;

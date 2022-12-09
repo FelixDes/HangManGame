@@ -7,8 +7,6 @@ public interface Storage<T> {
 
     T getForId(String id);
 
-//    void save(String id, T t);
-
     void delete(String id);
 
     void update(String id, T t);

@@ -1,17 +1,13 @@
 package HangMan.db.dao;
 
 import HangMan.db.connector.DBControllerH2;
-import HangMan.db.storage.MockStorage;
 import HangMan.model.GameInstance;
-import org.apache.commons.lang3.ArrayUtils;
 import org.di.annotations.Component;
 import org.di.annotations.Inject;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,13 +20,15 @@ public class GameInstanceDAO implements DAO<GameInstance> {
         Map<String, GameInstance> map = new HashMap<>();
         try (var rs = dbControllerH2.executeQuery("select * from GAME_INSTANCE;")) {
             while (rs.next()) {
-                map.put(rs.getString("id"), new GameInstance(
-                        rs.getString("word"),
-                        stringToCurrentLetters(rs.getString("currentLetters")),
-                        rs.getInt("deathState"),
-                        rs.getInt("winFlag"),
-                        rs.getString("alreadyTried").chars().mapToObj(c -> Character.valueOf((char) c)).collect(Collectors.toList())
-                ));
+                map.put(rs.getString("id"),
+                        new GameInstance(
+                                rs.getString("word"),
+                                stringToCurrentLetters(rs.getString("currentLetters")),
+                                rs.getInt("deathState"),
+                                rs.getInt("winFlag"),
+                                rs.getString("alreadyTried").chars().mapToObj(c -> (char) c).collect(Collectors.toList())
+                        )
+                );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -57,7 +55,6 @@ public class GameInstanceDAO implements DAO<GameInstance> {
         return gameInstance;
     }
 
-//    @Override
     private void save(String id, GameInstance gi) {
         String insert = "insert into game_instance (id, word, currentLetters, deathState, winFlag, alreadyTried) values (?, ?, ?, ?, ?, ?);";
         try (var st = dbControllerH2.prepareStatement(insert)) {
@@ -76,7 +73,8 @@ public class GameInstanceDAO implements DAO<GameInstance> {
 
     @Override
     public void delete(String id) {
-        try (var rs = dbControllerH2.executeQuery("delete from game_instance where id = '" + id + "'")) {
+        try {
+            dbControllerH2.executeQuery("delete from game_instance where id = '" + id + "'").close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -87,13 +85,7 @@ public class GameInstanceDAO implements DAO<GameInstance> {
         if (!getAll().containsKey(id)) {
             save(id, gi);
         } else {
-            String update = "update game_instance set " +
-                    "word = ?, " +
-                    "currentLetters = ?, " +
-                    "deathState = ?, " +
-                    "winFlag = ?, " +
-                    "alreadyTried = ? " +
-                    "where id = ?";
+            String update = "update game_instance set word = ?, currentLetters = ?, deathState = ?, winFlag = ?, alreadyTried = ? where id = ?";
             try (var st = dbControllerH2.prepareStatement(update)) {
                 st.setString(1, gi.getWord());
                 st.setString(2, currentLettersToString(gi.getCurrentLetters()));

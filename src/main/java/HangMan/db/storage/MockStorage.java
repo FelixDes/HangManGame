@@ -19,12 +19,6 @@ public class MockStorage<T> implements Storage<T> {
     public T getForId(String id) {
         return table.get(id);
     }
-//
-//    @Override
-//    public void save(String id, T user) {
-//        ids.add(id);
-//        table.put(id, user);
-//    }
 
     @Override
     public void delete(String id) {

@@ -1,24 +1,21 @@
 <template>
   <v-app>
     <v-main>
-      <HangMan/>
+      <HangManGame/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HangMan from "@/components/HangMan";
+
+import HangManGame from "@/components/HangManGame";
 
 export default {
   name: 'App',
 
   components: {
-    HangMan,
+    HangManGame,
   },
-
-  data: () => ({
-    //
-  }),
 }
 </script>
 

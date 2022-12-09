@@ -8,8 +8,6 @@ public interface DAO<T> {
 
     T getForId(String id);
 
-//    String save(T t);
-
     void delete(String id);
 
     void update(String id, T t);
